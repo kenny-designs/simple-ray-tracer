@@ -5,16 +5,17 @@
 #include <vector>
 #include <iostream>
 #include <cassert>
+#include <string>
 
 #include "Vec3.hpp"
 #include "Sphere.hpp"
 
-// This variable controls the maximum recursion depth
-constexpr unsigned MAX_RAY_DEPTH = 5;
-constexpr unsigned WIDTH = 640;
-constexpr unsigned HEIGHT = 480;
-constexpr float FOV = 30.0f;
-constexpr char FILENAME[] = "./sphere-image.ppm";
+constexpr unsigned MAX_RAY_DEPTH = 5;               // Maximum recursion depth
+constexpr unsigned WIDTH = 640;                     // Width of output image
+constexpr unsigned HEIGHT = 480;                    // Height of output image
+constexpr float FOV = 30.0f;                        // Field of View
+const std::string FILENAME = "./sphere-image.ppm";  // Name of output image
+const Vec3f BG_COLOR(2);                            // Background color
 
 /**
  * Mixes two scalar values based on a mix value.
@@ -49,7 +50,7 @@ Vec3f trace(
     float tnear = INFINITY;
     const Sphere *sphere = NULL;
 
-    // Find intersection of this ray with the sphere in the scene
+    // Find intersection of this ray with the closest sphere in the scene
     for (unsigned i = 0; i < spheres.size(); ++i)
     {
         float t0 = INFINITY, t1 = INFINITY;
@@ -66,7 +67,7 @@ Vec3f trace(
     }
 
     // If there's no intersection return black or background color
-    if (!sphere) return Vec3f(2);
+    if (!sphere) return BG_COLOR;
 
     Vec3f surfaceColor = 0;                // color of the ray/surfaceof the object intersected by the ray
     Vec3f phit = rayorig + raydir * tnear; // point of intersection
@@ -85,6 +86,7 @@ Vec3f trace(
         inside = true;
     }
 
+    // If the sphere is transparent and/or reflective, perform additional computation
     if ((sphere->transparency > 0 || sphere->reflection > 0) && depth < MAX_RAY_DEPTH)
     {
         float facingratio = -raydir.dot(nhit);
@@ -107,19 +109,20 @@ Vec3f trace(
             refrdir.normalize();
             refraction = trace(phit - nhit * bias, refrdir, spheres, depth + 1);
         }
+
         // the result is a mix of reflection and refraction (if the sphere is transparent)
         surfaceColor = (reflection * fresneleffect +
                         refraction * (1 - fresneleffect) * sphere->transparency) *
                        sphere->surfaceColor;
     }
+    // Sphere has only diffuse, no need to extra calculation
     else
     {
-        // it's a diffuse object, no need to raytrace any further
         for (unsigned i = 0; i < spheres.size(); ++i)
         {
+            // Sphere is a light
             if (spheres[i].emissionColor.x > 0)
             {
-                // this is a light
                 Vec3f transmission = 1;
                 Vec3f lightDirection = spheres[i].center - phit;
                 lightDirection.normalize();
@@ -135,6 +138,7 @@ Vec3f trace(
                         }
                     }
                 }
+
                 surfaceColor += sphere->surfaceColor * transmission *
                                 std::max(float(0), nhit.dot(lightDirection)) * spheres[i].emissionColor;
             }
