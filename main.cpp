@@ -1,5 +1,3 @@
-// A very basic raytracer example.
-// c++ -o raytracer -O3 -Wall raytracer.cpp
 #include <cstdlib>
 #include <cstdio>
 #include <cmath>
@@ -14,19 +12,29 @@
 // This variable controls the maximum recursion depth
 #define MAX_RAY_DEPTH 5
 
+/**
+ * Mixes two scalar values based on a mix value.
+ * 
+ * @a The first scalar value.
+ * @b The second scalar value.
+ * @mix The amount to mix these two values by.
+ * @return The final mixed value.
+ */
 float mix(const float &a, const float &b, const float &mix)
 {
     return b * mix + a * (1 - mix);
 }
 
-// This is the main trace function. It takes a ray as argument (defined by its origin
-// and direction). We test if this ray intersects any of the geometry in the scene.
-// If the ray intersects an object, we compute the intersection point, the normal
-// at the intersection point, and shade this point using this information.
-// Shading depends on the surface property (is it transparent, reflective, diffuse).
-// The function returns a color for the ray. If the ray intersects an object that
-// is the color of the object at the intersection point, otherwise it returns
-// the background color.
+/**
+ * This is the main trace function. It takes a ray as argument (defined by its origin
+ * and direction). We test if this ray intersects any of the geometry in the scene.
+ * If the ray intersects an object, we compute the intersection point, the normal
+ * at the intersection point, and shade this point using this information.
+ * Shading depends on the surface property (is it transparent, reflective, diffuse).
+ * The function returns a color for the ray. If the ray intersects an object that
+ * is the color of the object at the intersection point, otherwise it returns
+ * the background color.
+*/
 Vec3f trace(
     const Vec3f &rayorig,
     const Vec3f &raydir,
@@ -36,7 +44,8 @@ Vec3f trace(
     //if (raydir.length() != 1) std::cerr << "Error " << raydir << std::endl;
     float tnear = INFINITY;
     const Sphere *sphere = NULL;
-    // find intersection of this ray with the sphere in the scene
+
+    // Find intersection of this ray with the sphere in the scene
     for (unsigned i = 0; i < spheres.size(); ++i)
     {
         float t0 = INFINITY, t1 = INFINITY;
@@ -51,13 +60,15 @@ Vec3f trace(
             }
         }
     }
-    // if there's no intersection return black or background color
-    if (!sphere)
-        return Vec3f(2);
+
+    // If there's no intersection return black or background color
+    if (!sphere) return Vec3f(2);
+
     Vec3f surfaceColor = 0;                // color of the ray/surfaceof the object intersected by the ray
     Vec3f phit = rayorig + raydir * tnear; // point of intersection
     Vec3f nhit = phit - sphere->center;    // normal at the intersection point
     nhit.normalize();                      // normalize normal direction
+
     // If the normal and the view direction are not opposite to each other
     // reverse the normal direction. That also means we are inside the sphere so set
     // the inside bool to true. Finally reverse the sign of IdotN which we want
@@ -65,7 +76,11 @@ Vec3f trace(
     float bias = 1e-4; // add some bias to the point from which we will be tracing
     bool inside = false;
     if (raydir.dot(nhit) > 0)
-        nhit = -nhit, inside = true;
+    {
+        nhit = -nhit;
+        inside = true;
+    }
+
     if ((sphere->transparency > 0 || sphere->reflection > 0) && depth < MAX_RAY_DEPTH)
     {
         float facingratio = -raydir.dot(nhit);
@@ -77,6 +92,7 @@ Vec3f trace(
         refldir.normalize();
         Vec3f reflection = trace(phit + nhit * bias, refldir, spheres, depth + 1);
         Vec3f refraction = 0;
+
         // if the sphere is also transparent compute refraction ray (transmission)
         if (sphere->transparency)
         {
@@ -124,11 +140,11 @@ Vec3f trace(
     return surfaceColor + sphere->emissionColor;
 }
 
-//[comment]
-// Main rendering function. We compute a camera ray for each pixel of the image
-// trace it and return a color. If the ray hits a sphere, we return the color of the
-// sphere at the intersection point, else we return the background color.
-//[/comment]
+/**
+ * Main rendering function. We compute a camera ray for each pixel of the image
+ * trace it and return a color. If the ray hits a sphere, we return the color of the
+ * sphere at the intersection point, else we return the background color.
+ */
 void render(const std::vector<Sphere> &spheres)
 {
     unsigned width = 640, height = 480;
@@ -136,6 +152,7 @@ void render(const std::vector<Sphere> &spheres)
     float invWidth = 1 / float(width), invHeight = 1 / float(height);
     float fov = 30, aspectratio = width / float(height);
     float angle = tan(M_PI * 0.5 * fov / 180.);
+
     // Trace rays
     for (unsigned y = 0; y < height; ++y)
     {
@@ -148,6 +165,7 @@ void render(const std::vector<Sphere> &spheres)
             *pixel = trace(Vec3f(0), raydir, spheres, 0);
         }
     }
+
     // Save result to a PPM image (keep these flags if you compile under Windows)
     std::ofstream ofs("./untitled.ppm", std::ios::out | std::ios::binary);
     ofs << "P6\n"
@@ -160,9 +178,11 @@ void render(const std::vector<Sphere> &spheres)
     delete[] image;
 }
 
-// In the main function, we will create the scene which is composed of 5 spheres
-// and 1 light (which is also a sphere). Then, once the scene description is complete
-// we render that scene, by calling the render() function.
+/**
+ * In the main function, we will create the scene which is composed of 5 spheres
+ * and 1 light (which is also a sphere). Then, once the scene description is complete
+ * we render that scene, by calling the render() function.
+ */
 int main(int argc, char **argv)
 {
     srand48(13);
