@@ -43,11 +43,20 @@ public:
      */
     bool intersect(const Vec3f &rayorig, const Vec3f &raydir, float &t0, float &t1) const
     {
+        // First, find the vector between the center of the sphere and the origin of the ray
         Vec3f l = center - rayorig;
+
+        // Remember, a point (ray) consist of an origin, a direction, and a scalar value multiplied
+        // by that direction. tca is a scalar value that lets us intersect the sphere.
         float tca = l.dot(raydir);
+
+        // If tca is less than 0, then it does not intersect the sphere!
         if (tca < 0) return false;
 
+        // We do this based on the pythagorean theorem.
         float d2 = l.dot(l) - tca * tca;
+
+        // If d2 exceeds the radius, then we'll get a point outside the sphere thus no intersection!
         if (d2 > radius2) return false;
 
         float thc = sqrt(radius2 - d2);
