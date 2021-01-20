@@ -1,25 +1,5 @@
-// [header]
 // A very basic raytracer example.
-// [/header]
-// [compile]
 // c++ -o raytracer -O3 -Wall raytracer.cpp
-// [/compile]
-// [ignore]
-// Copyright (C) 2012  www.scratchapixel.com
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
-// [/ignore]
 #include <cstdlib>
 #include <cstdio>
 #include <cmath>
@@ -28,6 +8,8 @@
 #include <iostream>
 #include <cassert>
 
+#include "Vec3.hpp"
+
 #if defined __linux__ || defined __APPLE__
 // "Compiled for Linux
 #else
@@ -35,51 +17,6 @@
 #define M_PI 3.141592653589793
 #define INFINITY 1e8
 #endif
-
-template <typename T>
-class Vec3
-{
-public:
-    T x, y, z;
-    Vec3() : x(T(0)), y(T(0)), z(T(0)) {}
-    Vec3(T xx) : x(xx), y(xx), z(xx) {}
-    Vec3(T xx, T yy, T zz) : x(xx), y(yy), z(zz) {}
-    Vec3 &normalize()
-    {
-        T nor2 = length2();
-        if (nor2 > 0)
-        {
-            T invNor = 1 / sqrt(nor2);
-            x *= invNor, y *= invNor, z *= invNor;
-        }
-        return *this;
-    }
-    Vec3<T> operator*(const T &f) const { return Vec3<T>(x * f, y * f, z * f); }
-    Vec3<T> operator*(const Vec3<T> &v) const { return Vec3<T>(x * v.x, y * v.y, z * v.z); }
-    T dot(const Vec3<T> &v) const { return x * v.x + y * v.y + z * v.z; }
-    Vec3<T> operator-(const Vec3<T> &v) const { return Vec3<T>(x - v.x, y - v.y, z - v.z); }
-    Vec3<T> operator+(const Vec3<T> &v) const { return Vec3<T>(x + v.x, y + v.y, z + v.z); }
-    Vec3<T> &operator+=(const Vec3<T> &v)
-    {
-        x += v.x, y += v.y, z += v.z;
-        return *this;
-    }
-    Vec3<T> &operator*=(const Vec3<T> &v)
-    {
-        x *= v.x, y *= v.y, z *= v.z;
-        return *this;
-    }
-    Vec3<T> operator-() const { return Vec3<T>(-x, -y, -z); }
-    T length2() const { return x * x + y * y + z * z; }
-    T length() const { return sqrt(length2()); }
-    friend std::ostream &operator<<(std::ostream &os, const Vec3<T> &v)
-    {
-        os << "[" << v.x << " " << v.y << " " << v.z << "]";
-        return os;
-    }
-};
-
-typedef Vec3<float> Vec3f;
 
 class Sphere
 {
