@@ -18,6 +18,17 @@ public:
     float radius, radius2;             /// sphere radius and radius^2
     Vec3f surfaceColor, emissionColor; /// surface color and emission (light)
     float transparency, reflection;    /// surface transparency and reflectivity
+
+    /**
+     * Sphere constructor.
+     * 
+     * @c Center of the sphere.
+     * @r Radius of the sphere..
+     * @sc Surface color of the sphere.
+     * @refl Reflection of the sphere.
+     * @transp Transparency of the sphere.
+     * @ec Emission color of the sphere.
+     */
     Sphere(
         const Vec3f &c,
         const float &r,
@@ -25,21 +36,20 @@ public:
         const float &refl = 0,
         const float &transp = 0,
         const Vec3f &ec = 0) : center(c), radius(r), radius2(r * r), surfaceColor(sc), emissionColor(ec),
-                               transparency(transp), reflection(refl)
-    { /* empty */
-    }
-    //[comment]
-    // Compute a ray-sphere intersection using the geometric solution
-    //[/comment]
+                               transparency(transp), reflection(refl) {}
+
+    /**
+     * Compute a ray-sphere intersection using the geometric solution.
+     */
     bool intersect(const Vec3f &rayorig, const Vec3f &raydir, float &t0, float &t1) const
     {
         Vec3f l = center - rayorig;
         float tca = l.dot(raydir);
-        if (tca < 0)
-            return false;
+        if (tca < 0) return false;
+
         float d2 = l.dot(l) - tca * tca;
-        if (d2 > radius2)
-            return false;
+        if (d2 > radius2) return false;
+
         float thc = sqrt(radius2 - d2);
         t0 = tca - thc;
         t1 = tca + thc;
