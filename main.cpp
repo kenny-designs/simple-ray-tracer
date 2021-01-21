@@ -4,21 +4,18 @@
 #include <fstream>
 #include <vector>
 #include <iostream>
-#include <cassert>
 #include <string>
 
 #include "Vec3.hpp"
 #include "Sphere.hpp"
 #include "RayTracer.hpp"
 
-/*
 constexpr unsigned MAX_RAY_DEPTH = 5;               // Maximum recursion depth
 constexpr unsigned WIDTH = 640;                     // Width of output image
 constexpr unsigned HEIGHT = 480;                    // Height of output image
 constexpr float FOV = 30.0f;                        // Field of View
 const std::string FILENAME = "./sphere-image.ppm";  // Name of output image
 const Vec3f BG_COLOR(2);                            // Background color
-*/
 
 /**
  * In the main function, we will create the scene which is composed of 5 spheres
@@ -43,7 +40,7 @@ int main(int argc, char **argv)
     spheres.push_back(Sphere(Vec3f(0.0, 20, -30), 3, Vec3f(0.00, 0.00, 0.00), 0, 0.0, Vec3f(3)));
 
     // Create our ray tracer then render the spheres
-    RayTracer rayTracer;
+    RayTracer rayTracer(MAX_RAY_DEPTH, WIDTH, HEIGHT, FOV, FILENAME, BG_COLOR);
     rayTracer.render(spheres);
 
     return 0;

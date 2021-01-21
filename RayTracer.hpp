@@ -13,6 +13,9 @@ public:
     RayTracer() : maxRayDepth(5), width(640), height(480),
                   fov(30.0f), filename("./untitled.ppm"), bgColor(2){};
 
+    RayTracer(unsigned depth, unsigned w, unsigned h, float fov, const std::string &filename, const Vec3f &bg) : 
+        maxRayDepth(depth), width(w), height(h), fov(fov), filename(filename), bgColor(bg) {};
+
     /**
      * Mixes two scalar values basedon a mix value.
      */
