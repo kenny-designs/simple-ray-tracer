@@ -1,9 +1,4 @@
-#include <cstdlib>
-#include <cstdio>
-#include <cmath>
-#include <fstream>
 #include <vector>
-#include <iostream>
 #include <string>
 
 #include "Vec3.hpp"
