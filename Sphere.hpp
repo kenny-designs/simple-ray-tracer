@@ -9,6 +9,7 @@
 #define INFINITY 1e8
 #endif
 
+#include <cmath>
 #include "Vec3.hpp"
 
 class Sphere

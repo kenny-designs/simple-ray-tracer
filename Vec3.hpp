@@ -1,6 +1,9 @@
 #ifndef VEC3_HPP
 #define VEC3_HPP
 
+#include <fstream>
+#include <cmath>
+
 /**
  * Represents a 3-dimensional vector.
  */ 
