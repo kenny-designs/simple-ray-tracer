@@ -149,6 +149,31 @@ Vec3f trace(
 }
 
 /**
+ * Write image data to a PPM file.
+ * 
+ * @width Width of the image
+ * @height Height of the image
+ * @image Array of image data
+ */ 
+void writeToPPM(unsigned width, unsigned height, Vec3f *image)
+{
+    // Save result to a PPM image (keep these flags if you compile under Windows)
+    std::ofstream ofs(FILENAME, std::ios::out | std::ios::binary);
+
+    // Create header for our PPM image file
+    ofs << "P6\n"
+        << width << " " << height << "\n255\n";
+
+    // Write the color data for each pixel to the PPM file
+    for (unsigned i = 0; i < width * height; ++i)
+    {
+        ofs << (unsigned char)(std::min(float(1), image[i].x) * 255) << (unsigned char)(std::min(float(1), image[i].y) * 255) << (unsigned char)(std::min(float(1), image[i].z) * 255);
+    }
+
+    ofs.close();
+}
+
+/**
  * Main rendering function. We compute a camera ray for each pixel of the image
  * trace it and return a color. If the ray hits a sphere, we return the color of the
  * sphere at the intersection point, else we return the background color.
@@ -181,19 +206,9 @@ void render(const std::vector<Sphere> &spheres)
         }
     }
 
-    // Save result to a PPM image (keep these flags if you compile under Windows)
-    std::ofstream ofs(FILENAME, std::ios::out | std::ios::binary);
+    // Write the resulting image data to a PPM file
+    writeToPPM(width, height, image);
 
-    // Create header for our PPM image file
-    ofs << "P6\n" << width << " " << height << "\n255\n";
-
-    // Write the color data for each pixel to the PPM file
-    for (unsigned i = 0; i < width * height; ++i)
-    {
-        ofs << (unsigned char)(std::min(float(1), image[i].x) * 255) << (unsigned char)(std::min(float(1), image[i].y) * 255) << (unsigned char)(std::min(float(1), image[i].z) * 255);
-    }
-
-    ofs.close();
     delete[] image;
 }
 
